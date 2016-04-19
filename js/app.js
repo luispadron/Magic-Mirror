@@ -1,4 +1,9 @@
-var forecastAPI = 'https://api.forecast.io/forecast/***REMOVED***/37.8267,-122.423';
-$.getJSON().done(function(data) {
-  console.log(data);
-});
+var forecastAPI = 'https://api.forecast.io/forecast//37.8267,-122.423';
+
+function getApiKeyFromFile() {
+  $.get('assets/apikey.txt', function(data) {
+      alert(data);
+  });
+}
+
+getApiKeyFromFile();
