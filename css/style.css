@@ -1,0 +1,44 @@
+/* Font weights
+   Lato Font
+   300 Light, 400 Normal, 700 Bold
+*/
+
+body {
+  background-color: black;
+  color: white;
+  font-family: 'Lato', sans-serif;
+  letter-spacing: 1px;
+  margin: 0;
+  padding: 0;
+}
+
+/* Style the weather module */
+
+.weather-info {
+  font-size: 20px;
+  font-weight: 400;
+  text-align: right;
+}
+
+#weather-icon {
+  height: 62px;
+  width: 62px;
+  vertical-align: middle;
+}
+.weather-info span {
+  font-size: 36px;
+  margin-left: 20px;
+  vertical-align: middle;
+}
+
+/* Style the date time module */
+
+.date-time-info {
+  text-align: center;
+  font-weight: 300;
+  font-size: 20px;
+}
+
+.date-time-info p {
+  margin-bottom: 2px;
+}

@@ -3,23 +3,28 @@
   <head>
     <meta charset="utf-8">
     <title>Magic Mirror</title>
-    <link rel="stylesheet" href="css/styles.css" media="screen" charset="utf-8">
-     <link href='https://fonts.googleapis.com/css?family=Raleway:300,400,500,700'
-     rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+    integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/style.css" media="screen" charset="utf-8">
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,300,700" rel="stylesheet" type="text/css">
   </head>
   <body>
-    <div class="main-info">
-        <p id="location">Orlando, Florida</p>
-        <div id="weather-parent">
-          <div id="weather">
-            <img id="weather-icon" src="assets/PartlyCloudy.png"/>
-          </div>
-          <div id="weather-info">
-            <span>72&deg;</span>
-          </div>
-        </div>
-        <p id="date">Friday, April 21</p>
-        <p id="time">11:53 PM</p>
+    <div class="row">
+      <!-- Notification -->
+      <div class="col-lg-4">
+        Notification content goes here!
+      </div>
+      <!-- Date & Time info -->
+      <div class="col-lg-4 date-time-info">
+        <p>Friday, April 21</p>
+        <p>11:53 PM</p>
+      </div>
+      <!-- Weather info -->
+      <div class="clearfix col-lg-4 weather-info">
+        <p>Orlando, Florida</p>
+        <img id="weather-icon" src="assets/partly-cloudy-day.png"/>
+        <span>100&deg;</span>
+      </div>
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
     <script src="js/app.js" charset="utf-8"></script>
