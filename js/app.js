@@ -66,15 +66,55 @@ function updateTime() {
 /* ------------- WEATHER METHODS ----------- */
 
 // Updates the weather panel with the retrieved weather information
-function updateWeatherInfo(data) {
+function updateWeatherInfo(json) {
   console.log('Updating weather info!');
   // Round temp down
-  var temp = Math.floor(data.currently.temperature);
-  // Set temp
-  $('.weather-info span').text(temp + '°');
+  var currentTemp = Math.floor(json.currently.temperature);
+  // Set current temp
+  $('#main-weather-temp').text(currentTemp + '°');
   // Set the icon depending on what forecast.io tells us
-  var weatherIcon = 'assets/' + data.currently.icon + '.png';
-  $('#weather-icon').attr('src', weatherIcon);
+  var weatherIcon = 'assets/images/' + json.currently.icon + '.png';
+  $('#main-weather-icon').attr('src', weatherIcon);
+
+  // Set sunrise and sundown time
+  var dailyArray = json.daily.data;
+  // This is in UNIX time, must be converted, also 0 element because
+  // Only care about sunrise/sundown time for current day.
+  var sunriseTime = dailyArray[0].sunriseTime;
+  var sunsetTime = dailyArray[0].sunsetTime;
+  var sunriseDate = new Date(sunriseTime * 1000);
+  var sunsetDate = new Date(sunsetTime * 1000);
+  // Format dates
+  var sunriseFormatted = (sunriseDate.getHours() > 12) ? sunriseDate.getHours() - 12 : sunriseDate.getHours();
+  sunriseFormatted = (sunriseDate.getHours() === 0) ? 12 : sunriseFormatted;
+  sunriseFormatted += ':';
+  sunriseFormatted += (sunriseDate.getMinutes() < 10 ? '0' : '') + sunriseDate.getMinutes();
+
+  var sunsetFormatted = (sunsetDate.getHours() > 12) ? sunsetDate.getHours() - 12 : sunsetDate.getHours();
+  sunsetFormatted = (sunsetDate.getHours() === 0) ? 12 : sunsetFormatted;
+  sunsetFormatted += ':';
+  sunsetFormatted += (sunsetDate.getMinutes() < 10 ? '0' : '') + sunsetDate.getMinutes();
+
+  // Set time in HTML
+  $('.sun-up-down p span').text(sunriseFormatted);
+  $('.sun-up-down p span').next().text(sunsetFormatted);
+
+  // Set upcoming weather
+  $('.secondary-weather-icon').each(function(i) {
+    // Set each image
+    var img = 'assets/images/' + dailyArray[i].icon + '.png';
+    $(this).attr('src', img);
+  });
+
+  $('.daily-forecast span').each(function(i) {
+    var max = Math.floor(dailyArray[i].temperatureMax);
+    var min = Math.floor(dailyArray[i].temperatureMin);
+    
+    var text = '↑' + max + '° ' + ' ↓' + min + '°';
+    $(this).text(text);
+  });
+
+
 }
 
 // Makes a JSONP request to developer.forecast.io,

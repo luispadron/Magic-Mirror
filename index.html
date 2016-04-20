@@ -20,10 +20,36 @@
         <p>- - -</p>
       </div>
       <!-- Weather info -->
-      <div class="clearfix col-lg-4 weather-info">
+      <div class="col-lg-4 weather-info">
         <p>Orlando, Florida</p>
-        <img id="weather-icon" src="assets/partly-cloudy-day.png"/>
-        <span>100&deg;</span>
+        <img id="main-weather-icon" src="assets/images/partly-cloudy-day.png"/>
+        <span id="main-weather-temp">100&deg;</span>
+        <br>
+        <br>
+        <div class="sun-up-down">
+          <img class="sun-img" src="assets/images/sunrise.png" />
+          <img class="sun-img" src="assets/images/sunset.png" />
+          <p class="sun-text">
+            <span>6:30</span>
+            <span>7:30</span>
+          </p>
+        </div>
+        <br>
+        <div class="daily-forecast">
+          <!-- Next day -->
+          <p>Tomorrow</p>
+          <img class="secondary-weather-icon" src="assets/images/rain.png"/>
+          <span>&#8593; 100&deg;   &#8595; 73&deg;</span>
+          <!-- Day after next -->
+          <p>Friday</p>
+          <img class="secondary-weather-icon" src="assets/images/rain.png"/>
+          <span>&#8593; 100&deg;   &#8595; 73&deg;</span>
+          <!-- What would you know, the day after next AGAIN -->
+          <p>Saturday</p>
+          <img class="secondary-weather-icon" src="assets/images/rain.png"/>
+          <span>&#8593; 100&deg;   &#8595; 73&deg;</span>
+        </div>
+
       </div>
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
