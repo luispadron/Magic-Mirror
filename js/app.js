@@ -56,9 +56,9 @@ function updateTime() {
   var dateString = weekday[currentDate.getDay()] + ', ' + month[currentDate.getMonth()] +
   ' ' + currentDate.getDate();
 
-  $('.date-time-info p').text(dateString);
+  $('.date-time-info p').next().text(dateString);
   // Update the time in HTML
-  $('.date-time-info p').next().text(finalTimeString);
+  $('.date-time-info p').next().next().text(finalTimeString);
   // Recursively call setTimeout in order to repeat every minute
   interval = setTimeout(updateTime, 1000);
 }
@@ -109,7 +109,7 @@ function updateWeatherInfo(json) {
   $('.daily-forecast span').each(function(i) {
     var max = Math.floor(dailyArray[i].temperatureMax);
     var min = Math.floor(dailyArray[i].temperatureMin);
-    
+
     var text = '↑' + max + '° ' + ' ↓' + min + '°';
     $(this).text(text);
   });

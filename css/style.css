@@ -49,7 +49,7 @@ body {
 }
 
 .sun-img:not(:first-of-type) {
-  margin-left: 80px;
+  margin-left: 60px;
 }
 
 .sun-text {
@@ -57,7 +57,7 @@ body {
 }
 
 .sun-text span:not(:first-of-type) {
-  margin-left: 79px;
+  margin-left: 59px;
 }
 
 .daily-forecast {
