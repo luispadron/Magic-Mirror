@@ -11,8 +11,17 @@
   <body>
     <div class="row">
       <!-- Notification -->
-      <div class="col-lg-4 col-med-4 col-xs-4">
-        Notification content goes here!
+      <div class="col-lg-4 col-med-4 col-xs-4 todos-module">
+        <img id="todo-img" src="assets/images/todo-icon.png"/>
+        <br>
+        <br>
+        <p>
+          Today
+        </p>
+        <img id="todo-circle" src="assets/images/circle.png"/>
+        <span class="todo-item"> Paper for Philosophy</span>
+        <br>
+        <span class="todo-item-extra">Due at: 8:39 PM</span>
       </div>
       <!-- Date & Time info -->
       <div class="col-lg-4 col-med-4 col-xs-4 date-time-info">
@@ -48,10 +57,12 @@
           <img class="secondary-weather-icon" src="assets/images/rain.png"/>
           <span>&#8593; 100&deg;   &#8595; 73&deg;</span>
         </div>
-
       </div>
     </div>
+    <!-- Add jquery  -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
-    <script src="js/app.js" charset="utf-8"></script>
+    <!-- Add Wunderlist SDK for todo's -->
+    <script type="text/javascript" src="libs/wunderlist.sdk.js"></script>
+    <script type="text/javascript" src="js/app.js" charset="utf-8"></script>
   </body>
 </html>

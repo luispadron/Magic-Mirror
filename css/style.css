@@ -103,3 +103,23 @@ body {
 .date-time-info p {
   margin-bottom: 2px;
 }
+
+/* Style todos module */
+
+#todo-img {
+  width: 58px;
+  height: 58px;
+  vertical-align: middle;
+}
+
+#todo-circle {
+  width: 18px;
+  height: 18px;
+  vertical-align: middle;
+}
+
+.todo-item-extra {
+  font-size: 12px;
+  opacity: 0.6;
+  margin-left: 22px;
+}
