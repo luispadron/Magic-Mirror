@@ -60,7 +60,7 @@ function addTasksToPage(tasksR, tasksN) {
   });
 
   // After appending content start a time out of 15 minutes, to grab reminders every 15 minutes
-  setTimeout(requestWunderlist(), 900000);
+  setTimeout(requestWunderlist, 900000);
 }
 
 function cleanUpItems(tasks, reminders) {
@@ -405,7 +405,6 @@ function formatFullDate(date) {
   ];
   var dateString = weekday[date.getDay()] + ', ' + month[date.getMonth()] +
   ' ' + date.getDate() + ' at ' + formattedTime;
-  console.log(dateString);
   return dateString;
 }
 
