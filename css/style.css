@@ -67,6 +67,7 @@ body {
   opacity: 0.5;
   display: inline-block;
   text-align: center;
+  border: 1px solid white;
 }
 
 .daily-forecast p {
@@ -105,6 +106,18 @@ body {
 }
 
 /* Style todos module */
+
+.todos-module {
+  display: inline-block;
+}
+
+.todos-module h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  display: inline-block;
+  border-bottom: 1px solid white;
+  padding: 2px;
+}
 
 #todo-img {
   width: 58px;

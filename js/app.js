@@ -1,9 +1,87 @@
-// Globals
-var forecastURL;
+/* GLOBALS */
 
-// Timers, repeat the functions in order to keep data updated
-var dateTimeUpdater = setTimeout(updateTime, 1000);
-var weatherUpdater = setTimeout(getForecast, 300000);
+// API keys, kept on a local file not tracked loaded in loadKeys()
+// index: 0 = Forecast API key
+// index: 1 = Wunderlist Access Token
+// index: 2 = WUnderlist Client ID
+var apiKeys;
+var wunderlistToken;
+var wunderlistClientID;
+
+// Todo GLOBALS
+var tasks = [];
+var reminders;
+
+
+/* ------------- TODOS METHODS ----------- */
+
+function getRemindersFromTasks() {
+  
+}
+
+/* Cool we got a success from the server
+process all the list information and display it */
+function onInitialSuccess(result) {
+  // We get the list/list ids of the user which we can then
+  // use to make more calls and get more data
+  // Loop through the array of lists
+
+  result.forEach(function(index) {
+    // Get the task ID's for each list
+    var tasksURL = 'https://a.wunderlist.com/api/v1/tasks' + '?list_id=' + index.id;
+
+    $.ajax({
+      type: 'GET',
+      dataType: 'json',
+      url: tasksURL,
+      headers: {
+        'X-Access-Token': wunderlistToken,
+        'X-Client-ID': wunderlistClientID
+      },
+      contentType: 'application/json; charset=utf-8',
+      success: function(result) {
+        // Got tasks, now get any reminders for said tasks
+        if (result.length === 0) {
+          console.log(result);
+        } else {
+          console.log(result);
+          result.forEach(function(index){
+            // Add each task to array
+            tasks.push(index);
+          });
+          // Now get the reminders for each task...
+          getRemindersFromTasks();
+        }
+      },
+      error: function(error) {
+        console.log('Failed while getting tasks');
+        console.log(error);
+      }
+    });
+  });
+}
+
+function onInitialFail(result) {
+  /* oops, something broke */
+  alert('We broken fam, pls fix');
+  console.log(result);
+}
+
+function requestWunderlist() {
+  var wunderlistURL = 'https://a.wunderlist.com/api/v1/lists';
+    $.ajax({
+      type: 'GET',
+      dataType: 'json',
+      url: wunderlistURL,
+      headers: {
+        'X-Access-Token': wunderlistToken,
+        'X-Client-ID': wunderlistClientID
+      },
+      contentType: 'application/json; charset=utf-8',
+      success: onInitialSuccess,
+      error: onInitialFail
+    });
+}
 
 
 /* ------------- DATE TIME METHODS ----------- */
@@ -59,8 +137,8 @@ function updateTime() {
   $('.date-time-info p').next().text(dateString);
   // Update the time in HTML
   $('.date-time-info p').next().next().text(finalTimeString);
-  // Recursively call setTimeout in order to repeat every minute
-  interval = setTimeout(updateTime, 1000);
+  // Call self in order to repeat every second
+  setTimeout(updateTime, 1000);
 }
 
 /* ------------- WEATHER METHODS ----------- */
@@ -113,43 +191,46 @@ function updateWeatherInfo(json) {
     var text = '↑' + max + '° ' + ' ↓' + min + '°';
     $(this).text(text);
   });
-
-
 }
 
 // Makes a JSONP request to developer.forecast.io,
 // Callback on success: updateWeatherInfo(data)
-function requestForecastData() {
+function requestForecastData(url) {
+    // Build URL
+    // Set appropriate latitude and longitude for location here
+    var latitude = '28.521824';
+    var longitude = '-81.224258';
+    // Loaded in key
+    var key = apiKeys[0];
+
+    var forecastURL = 'https://api.forecast.io/forecast/' + key + '/' +
+      latitude + ',' + longitude;
+
     $.ajax({
       type: 'GET',
       dataType: 'jsonp',
       url: forecastURL,
       success: updateWeatherInfo,
-      complete: setTimeout(getForecast, 300000)
+      complete: setTimeout(requestForecastData, 300000)
     });
 }
 
-function getForecast() {
-  // Grabs API Key from file (if it hasnt been grabbed before), so it's not on github
-  if (forecastURL === undefined) {
-    $.get('assets/apikey.txt', function(data) {
-      console.log('No url, getting API key from file, to append to URL');
-      // Set appropriate latitude and longitude for location here
-      var latitude = '28.521824';
-      var longitude = '-81.224258';
+/* ------------- HELPERS ----------- */
 
-      forecastURL = 'https://api.forecast.io/forecast/' + data.trim() + '/' +
-      latitude + ',' + longitude;
-
-      requestForecastData();
-    });
-  } else {
-    console.log('We have URL already, getting weather');
+function loadKeys() {
+  // Happens once, when web page first loaded
+  // After finishing we call the rest of the functions
+  $.get('assets/apiKeys.txt', function(keys) {
+    apiKeys = keys.trim().split(',');
+    // Call the methods from here since we loaded the keys async
+    wunderlistToken = apiKeys[1];
+    wunderlistClientID = apiKeys[2];
+    updateTime();
     requestForecastData();
-  }
+    requestWunderlist();
+  });
 }
 
 // Called once, in order to get data initially, then
 // Timers handle the calls
-updateTime();
-getForecast();
+loadKeys();
