@@ -8,15 +8,68 @@ var apiKeys;
 var wunderlistToken;
 var wunderlistClientID;
 
-// Todo GLOBALS
-var tasks = [];
-var reminders;
-
 
 /* ------------- TODOS METHODS ----------- */
 
-function getRemindersFromTasks() {
-  
+function addTodosToPage(tasks, remindersForTasks) {
+  // Add all the tasks to the page
+  var todoCircle = '<img id="todo-circle" src="assets/images/circle.png"/>';
+  $todosModule = $('.todos-module');
+  console.table(tasks);
+  console.table(remindersForTasks);
+  tasks.forEach(function(index) {
+    var htmlForReminder = '';
+    // Check to see if task has a reminder
+    for(i = 0; i < remindersForTasks.length; i++) {
+      if (remindersForTasks[i].task_id === index.id) {
+        var formatted = new Date(remindersForTasks[i].date);
+        htmlForReminder = '<p class="todo-item-extra">Due at: ' + formatted + '</p>';
+      }
+    }
+    // Parse into HTML
+    var html = '<p class="todo-item">' + index.title + '</p>' + htmlForReminder;
+    $todosModule.append(html);
+  });
+}
+
+function getReminders(tasks) {
+  console.log('Getting reminders');
+  var itemsProcessed = 0;
+  var reminders = [];
+
+  tasks.forEach(function(index) {
+    // Get the ID's for each list
+    var remindersURL = 'https://a.wunderlist.com/api/v1/reminders' + '?task_id=' + index.id;
+
+    $.ajax({
+      type: 'GET',
+      dataType: 'json',
+      url: remindersURL,
+      headers: {
+        'X-Access-Token': wunderlistToken,
+        'X-Client-ID': wunderlistClientID
+      },
+      contentType: 'application/json; charset=utf-8',
+      success: function(reminder) {
+        itemsProcessed++;
+        // Got the reminders, add to array
+        reminder.forEach(function(index) {
+          console.log(index);
+          reminders.push(index);
+        });
+        // Once done iterating, and have gotten all reminders display items
+        if (itemsProcessed === tasks.length) {
+          // Now that we have both reminders (optional) and tasks, finally
+          // Display this to the page
+          addTodosToPage(tasks, reminders);
+        }
+      },
+      error: function(error) {
+        console.log('Failed while getting reminders');
+        console.log(error);
+      }
+    });
+  });
 }
 
 /* Cool we got a success from the server
@@ -25,7 +78,6 @@ function onInitialSuccess(result) {
   // We get the list/list ids of the user which we can then
   // use to make more calls and get more data
   // Loop through the array of lists
-
   result.forEach(function(index) {
     // Get the task ID's for each list
     var tasksURL = 'https://a.wunderlist.com/api/v1/tasks' + '?list_id=' + index.id;
@@ -41,16 +93,15 @@ function onInitialSuccess(result) {
       contentType: 'application/json; charset=utf-8',
       success: function(result) {
         // Got tasks, now get any reminders for said tasks
-        if (result.length === 0) {
-          console.log(result);
-        } else {
-          console.log(result);
+        var tasks = [];
+
+        if (result.length > 0) {
           result.forEach(function(index){
             // Add each task to array
             tasks.push(index);
           });
-          // Now get the reminders for each task...
-          getRemindersFromTasks();
+          // Now get reminders from each task...
+          getReminders(tasks);
         }
       },
       error: function(error) {

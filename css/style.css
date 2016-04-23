@@ -131,7 +131,17 @@ body {
   vertical-align: middle;
 }
 
+.todo-date {
+  font-size: 20px;
+  font-weight: 300;
+}
+
+.todo-item {
+  margin-bottom: 0;
+}
+
 .todo-item-extra {
+  margin-top: 3px;
   font-size: 12px;
   opacity: 0.6;
   margin-left: 22px;
