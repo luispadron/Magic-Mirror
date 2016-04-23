@@ -11,16 +11,21 @@ var wunderlistClientID;
 
 /* ------------- TODOS METHODS ----------- */
 
-function addTasksToPage(tasks) {
+function addTasksToPage(tasksR, tasksN) {
   // Add all the tasks to the page
   var todoCircle = '<img id="todo-circle" src="assets/images/circle.png"/>';
   var $todoModule = $('.todos-module');
   var haveAddedTodayTitle = false;
   var haveAddedUpcomingTitle = false;
 
-  tasks.forEach(function(task, index) {
+  // Clear out the div, this is important so that after first fetch,
+  // Div is clear and looks the same
+  $todoModule.empty();
+  $todoModule.append('<h3>REMINDERS</h3>');
+  // Do the tasks with reminders first, then the tasks with no remidners
+  tasksR.forEach(function(task, index) {
     // Set hours to zero, since just care about day
-    var dateForReminder = task.reminder.jsDate;
+    var dateForReminder = task.reminder.js_date;
     var today = new Date();
 
     if (dateForReminder.getDay() == today.getDay()) {
@@ -47,84 +52,76 @@ function addTasksToPage(tasks) {
       $todoModule.append('<p class="todo-item-extra">Due on: ' + formatted + '</p>');
     }
   });
+
+  tasksN.forEach(function(task, index) {
+    $todoModule.append(todoCircle);
+    $todoModule.append('<p class="todo-item-no-date">' + task.title + '</p>');
+    $todoModule.append('<br>');
+  });
+
+  // After appending content start a time out of 15 minutes, to grab reminders every 15 minutes
+  setTimeout(requestWunderlist(), 900000);
 }
 
-function organizeTasks(tasks, remindersForTasks) {
-  tasks.forEach(function(task) {
-    var htmlForReminder = '';
-    // Check to see if task has a reminder
-    for(i = 0; i < remindersForTasks.length; i++) {
-      if (remindersForTasks[i].task_id === task.id) {
-        // Create a new JS Date and add to reminder
-        var jsDate = new Date(remindersForTasks[i].date);
-        remindersForTasks[i].jsDate = jsDate;
-        // Append reminder to correct task
-        task.reminder = remindersForTasks[i];
+function cleanUpItems(tasks, reminders) {
+  // Remove duplicate reminders
+  for (i = 0; i < reminders.length; i++) {
+    var currentID = reminders[i].id;
+    for (j = 0; j < reminders.length; j++) {
+      var nextID = reminders[j].id;
+      if (i == j) {
+        continue;
+      } else if (currentID == nextID) {
+        reminders.splice(j, 1);
       }
     }
-    console.log(task);
-  });
-
-  // Sort tasks by date
-  tasks.sort(function(a, b) {
-    return a.reminder.jsDate - b.reminder.jsDate;
-  });
-
-  // After appending reminders to the appropriate tasks
-  // Figure out if task is due today, or upcoming
-  // Then append to the HTML and display
-  addTasksToPage(tasks);
-}
-
-function getReminders(tasks) {
-  console.log('Getting reminders');
-  var itemsProcessed = 0;
-  var reminders = [];
-
-  tasks.forEach(function(index) {
-    // Get the ID's for each list
-    var remindersURL = 'https://a.wunderlist.com/api/v1/reminders' + '?task_id=' + index.id;
-
-    $.ajax({
-      type: 'GET',
-      dataType: 'json',
-      url: remindersURL,
-      headers: {
-        'X-Access-Token': wunderlistToken,
-        'X-Client-ID': wunderlistClientID
-      },
-      contentType: 'application/json; charset=utf-8',
-      success: function(reminder) {
-        itemsProcessed++;
-        // Got the reminders, add to array
-        reminder.forEach(function(index) {
-          reminders.push(index);
-        });
-        // Once done iterating, and have gotten all reminders display items
-        if (itemsProcessed === tasks.length) {
-          // Now that we have both reminders (optional) and tasks, finally
-          // Display this to the page
-          organizeTasks(tasks, reminders);
-        }
-      },
-      error: function(error) {
-        console.log('Failed while getting reminders');
-        console.log(error);
+  }
+  // Create a new Javascript date and append it to reminder
+  for (i = 0; i < reminders.length; i++) {
+    var jsDate = new Date(reminders[i].date);
+    reminders[i].js_date = jsDate;
+  }
+  // Now match the tasks with their reminders (if a task has a reminder)
+  for (i = 0; i < tasks.length; i++) {
+    var task = tasks[i];
+    for (j = 0; j < reminders.length; j++) {
+      var reminder = reminders[j];
+      if (task.id == reminder.task_id) {
+        task.reminder = reminder;
       }
-    });
+    }
+  }
+  // Create two task arrays, one that has tasks with reminder and one with out
+  var tasksWithReminders = [];
+  var tasksNoReminders = [];
+  for (i = 0; i < tasks.length; i++) {
+    if (tasks[i].reminder == null) {
+      tasksNoReminders.push(tasks[i]);
+    } else {
+      tasksWithReminders.push(tasks[i]);
+    }
+  }
+  // Finally sort the array of tasks withs reminder according to their date
+  tasksWithReminders.sort(function(a, b) {
+    return a.reminder.js_date - b.reminder.js_date;
   });
+  // Now that everything is set up, display info on page
+  console.table(tasksWithReminders);
+  console.table(tasksNoReminders);
+  addTasksToPage(tasksWithReminders, tasksNoReminders);
 }
 
-/* Cool we got a success from the server
-process all the list information and display it */
-function onInitialSuccess(result) {
-  // We get the list/list ids of the user which we can then
-  // use to make more calls and get more data
-  // Loop through the array of lists
-  result.forEach(function(index) {
-    // Get the task ID's for each list
-    var tasksURL = 'https://a.wunderlist.com/api/v1/tasks' + '?list_id=' + index.id;
+function onSuccess(lists) {
+  var tasks = [];
+  var reminders = [];
+  var itemsProcessed = 0;
+  // Loop through all the lists and grab the tasks & reminders
+  for (i = 0; i < lists.length; i++) {
+    var list = lists[i];
+    var tasksURL = 'https://a.wunderlist.com/api/v1/tasks' + '?list_id=' + list.id;
+    var remindersURL = 'https://a.wunderlist.com/api/v1/reminders' + '?list_id=' + list.id;
 
+    // Get all the tasks for a list
     $.ajax({
       type: 'GET',
       dataType: 'json',
@@ -135,27 +132,47 @@ function onInitialSuccess(result) {
       },
       contentType: 'application/json; charset=utf-8',
       success: function(result) {
-        // Got tasks, now get any reminders for said tasks
-        var tasks = [];
-
         if (result.length > 0) {
-          result.forEach(function(index){
-            // Add each task to array
-            tasks.push(index);
+          result.forEach(function(task) {
+            tasks.push(task);
           });
-          // Now get reminders from each task...
-          getReminders(tasks);
         }
       },
-      error: function(error) {
-        console.log('Failed while getting tasks');
-        console.log(error);
+      complete: function() {
+        // Done gettting a task, now get the reminders
+        $.ajax({
+          type: 'GET',
+          dataType: 'json',
+          url: remindersURL,
+          headers: {
+            'X-Access-Token': wunderlistToken,
+            'X-Client-ID': wunderlistClientID
+          },
+          contentType: 'application/json; charset=utf-8',
+          success: function(result) {
+            // Add all reminders to array
+            if (result.length > 0) {
+              result.forEach(function(reminder) {
+                reminders.push(reminder);
+              });
+            }
+          },
+          complete: function() {
+            itemsProcessed++;
+            if (itemsProcessed === lists.length) {
+              // Finally done grabbing EVERYTHING
+              // Now do do some organization/clean up
+              cleanUpItems(tasks, reminders);
+              console.log('Completed grabbing tasks/reminders');
+            }
+          }
+        });
       }
     });
-  });
+  }
 }
 
-function onInitialFail(result) {
+function onFail(result) {
   /* oops, something broke */
   alert('We broken fam, pls fix');
   console.log(result);
@@ -172,8 +189,8 @@ function requestWunderlist() {
         'X-Client-ID': wunderlistClientID
       },
       contentType: 'application/json; charset=utf-8',
-      success: onInitialSuccess,
-      error: onInitialFail
+      success: onSuccess,
+      error: onFail
     });
 }
 
@@ -282,7 +299,7 @@ function updateWeatherInfo(json) {
     var text = '↑' + max + '° ' + ' ↓' + min + '°';
     $(this).text(text);
   });
-  console.log($('.daily-forecast p'));
+
   $('.daily-forecast p').each(function(i) {
     // Same as above start at i + 1, update the heading
     var weekday = [
