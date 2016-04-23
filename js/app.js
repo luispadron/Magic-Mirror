@@ -11,25 +11,69 @@ var wunderlistClientID;
 
 /* ------------- TODOS METHODS ----------- */
 
-function addTodosToPage(tasks, remindersForTasks) {
+function addTasksToPage(tasks) {
   // Add all the tasks to the page
   var todoCircle = '<img id="todo-circle" src="assets/images/circle.png"/>';
-  $todosModule = $('.todos-module');
-  console.table(tasks);
-  console.table(remindersForTasks);
-  tasks.forEach(function(index) {
+  var $todoModule = $('.todos-module');
+  var haveAddedTodayTitle = false;
+  var haveAddedUpcomingTitle = false;
+
+  tasks.forEach(function(task, index) {
+    // Set hours to zero, since just care about day
+    var dateForReminder = task.reminder.jsDate;
+    var today = new Date();
+
+    if (dateForReminder.getDay() == today.getDay()) {
+      // Due today, append after today section
+      if (!haveAddedTodayTitle) {
+        $todoModule.append('<p class="todo-date">Today</p>');
+        haveAddedTodayTitle = true;
+      }
+      $todoModule.append(todoCircle);
+      $todoModule.append('<p class="todo-item">' + task.title + '</p>');
+      var date = new Date(task.reminder.date);
+      var formattedDate = formatTime(date, true);
+      $todoModule.append('<p class="todo-item-extra">Due at: ' + formattedDate + '</p>');
+    } else {
+      if (!haveAddedUpcomingTitle) {
+        $todoModule.append('<p class="todo-date">Upcoming</p>');
+        haveAddedUpcomingTitle = true;
+      }
+      // Not due today
+      $todoModule.append(todoCircle);
+      $todoModule.append('<p class="todo-item">' + task.title + '</p>');
+      var unformatted = new Date(task.reminder.date);
+      var formatted = formatFullDate(unformatted);
+      $todoModule.append('<p class="todo-item-extra">Due on: ' + formatted + '</p>');
+    }
+  });
+}
+
+function organizeTasks(tasks, remindersForTasks) {
+  tasks.forEach(function(task) {
     var htmlForReminder = '';
     // Check to see if task has a reminder
     for(i = 0; i < remindersForTasks.length; i++) {
-      if (remindersForTasks[i].task_id === index.id) {
-        var formatted = new Date(remindersForTasks[i].date);
-        htmlForReminder = '<p class="todo-item-extra">Due at: ' + formatted + '</p>';
+      if (remindersForTasks[i].task_id === task.id) {
+        // Create a new JS Date and add to reminder
+        var jsDate = new Date(remindersForTasks[i].date);
+        remindersForTasks[i].jsDate = jsDate;
+        // Append reminder to correct task
+        task.reminder = remindersForTasks[i];
       }
     }
-    // Parse into HTML
-    var html = '<p class="todo-item">' + index.title + '</p>' + htmlForReminder;
-    $todosModule.append(html);
+    console.log(task);
   });
+
+  // Sort tasks by date
+  tasks.sort(function(a, b) {
+    return a.reminder.jsDate - b.reminder.jsDate;
+  });
+
+  // After appending reminders to the appropriate tasks
+  // Figure out if task is due today, or upcoming
+  // Then append to the HTML and display
+  addTasksToPage(tasks);
 }
 
 function getReminders(tasks) {
@@ -54,14 +98,13 @@ function getReminders(tasks) {
         itemsProcessed++;
         // Got the reminders, add to array
         reminder.forEach(function(index) {
-          console.log(index);
           reminders.push(index);
         });
         // Once done iterating, and have gotten all reminders display items
         if (itemsProcessed === tasks.length) {
           // Now that we have both reminders (optional) and tasks, finally
           // Display this to the page
-          addTodosToPage(tasks, reminders);
+          organizeTasks(tasks, reminders);
         }
       },
       error: function(error) {
@@ -213,16 +256,10 @@ function updateWeatherInfo(json) {
   var sunsetTime = dailyArray[0].sunsetTime;
   var sunriseDate = new Date(sunriseTime * 1000);
   var sunsetDate = new Date(sunsetTime * 1000);
-  // Format dates
-  var sunriseFormatted = (sunriseDate.getHours() > 12) ? sunriseDate.getHours() - 12 : sunriseDate.getHours();
-  sunriseFormatted = (sunriseDate.getHours() === 0) ? 12 : sunriseFormatted;
-  sunriseFormatted += ':';
-  sunriseFormatted += (sunriseDate.getMinutes() < 10 ? '0' : '') + sunriseDate.getMinutes();
 
-  var sunsetFormatted = (sunsetDate.getHours() > 12) ? sunsetDate.getHours() - 12 : sunsetDate.getHours();
-  sunsetFormatted = (sunsetDate.getHours() === 0) ? 12 : sunsetFormatted;
-  sunsetFormatted += ':';
-  sunsetFormatted += (sunsetDate.getMinutes() < 10 ? '0' : '') + sunsetDate.getMinutes();
+  // Format dates
+  var sunriseFormatted = formatTime(sunriseDate, false);
+  var sunsetFormatted = formatTime(sunsetDate, false);
 
   // Set time in HTML
   $('.sun-up-down p span').text(sunriseFormatted);
@@ -280,6 +317,56 @@ function loadKeys() {
     requestForecastData();
     requestWunderlist();
   });
+}
+
+function formatTime(date, withTimeOfDay) {
+  // Format from 24 hour time
+  var formattedDate = (date.getHours() > 12) ? date.getHours() - 12 : date.getHours();
+  formattedDate = (date.getHours() === 0) ? 12 : formattedDate;
+  formattedDate += ':';
+  formattedDate += (date.getMinutes() < 10 ? '0' : '') + date.getMinutes();
+
+  if (withTimeOfDay) {
+    var timeOfDay = (date.getHours() < 12) ? ' AM' : ' PM';
+    return formattedDate + timeOfDay;
+  } else {
+    return formattedDate;
+  }
+}
+
+function formatFullDate(date) {
+  // Formats entire time, used in the todos-module
+
+  // Format the time first
+  var formattedTime = formatTime(date, true);
+
+  var weekday = [
+    'Sun',
+    'Mon',
+    'Tue',
+    'Wed',
+    'Thur',
+    'Fri',
+    'Sat'
+  ];
+  var month = [
+    'Jan.',
+    'Feb.',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'Aug.',
+    'Sept.',
+    'Oct.',
+    'Nov.',
+    'Dec.'
+  ];
+  var dateString = weekday[date.getDay()] + ', ' + month[date.getMonth()] +
+  ' ' + date.getDate() + ' at ' + formattedTime;
+  console.log(dateString);
+  return dateString;
 }
 
 // Called once, in order to get data initially, then
