@@ -273,11 +273,34 @@ function updateWeatherInfo(json) {
   });
 
   $('.daily-forecast span').each(function(i) {
-    var max = Math.floor(dailyArray[i].temperatureMax);
-    var min = Math.floor(dailyArray[i].temperatureMin);
+    // i + 1 because we want the upcoming weather,
+    // The json from forecast always returns current weather
+    // at the 0th element, we want the next 3 days.
+    var max = Math.floor(dailyArray[i + 1].temperatureMax);
+    var min = Math.floor(dailyArray[i + 1].temperatureMin);
 
     var text = '↑' + max + '° ' + ' ↓' + min + '°';
     $(this).text(text);
+  });
+  console.log($('.daily-forecast p'));
+  $('.daily-forecast p').each(function(i) {
+    // Same as above start at i + 1, update the heading
+    var weekday = [
+      'Sunday',
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday'
+    ];
+    var date = new Date(dailyArray[i + 1].time * 1000);
+    var formattedDate = weekday[date.getDay()];
+    if (i === 0) {
+      $(this).text('Tomorrow');
+    } else {
+      $(this).text(formattedDate);
+    }
   });
 }
 
