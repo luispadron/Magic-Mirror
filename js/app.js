@@ -22,6 +22,7 @@ function addTasksToPage(tasksR, tasksN) {
   // Div is clear and looks the same
   $todoModule.empty();
   $todoModule.append('<h3>REMINDERS</h3>');
+  $todoModule.append('<br>');
   // Do the tasks with reminders first, then the tasks with no remidners
   tasksR.forEach(function(task, index) {
     // Set hours to zero, since just care about day
@@ -32,6 +33,7 @@ function addTasksToPage(tasksR, tasksN) {
       // Due today, append after today section
       if (!haveAddedTodayTitle) {
         $todoModule.append('<p class="todo-date">Today</p>');
+        $todoModule.append('<br>');
         haveAddedTodayTitle = true;
       }
       $todoModule.append(todoCircle);
@@ -42,6 +44,7 @@ function addTasksToPage(tasksR, tasksN) {
     } else {
       if (!haveAddedUpcomingTitle) {
         $todoModule.append('<p class="todo-date">Upcoming</p>');
+        $todoModule.append('<br>');
         haveAddedUpcomingTitle = true;
       }
       // Not due today
