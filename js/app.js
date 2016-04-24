@@ -394,6 +394,8 @@ function displayFeeds(feeds) {
     var formatted = formatFullDate(date, false);
     $newsModule.append('<p class="article-date">' + formatted + '</p>');
   }
+  // Set timeout to update feed every 5 minutes
+  setTimeout(getRSSFeeds, 300000);
 }
 
 function feedLoaded(feed) {
@@ -432,6 +434,27 @@ function getRSSFeeds() {
   viceNews.load(feedLoaded);
 }
 
+/* ------------- TRAFFIC MODULE ----------- */
+function getDirections() {
+  var DistanceMatrixService = new google.maps.DistanceMatrixService();
+  var home = new google.maps.LatLng({lat: 28.523559, lng: -81.223809});
+  var school = new google.maps.LatLng({lat: 28.552118, lng: -81.251784});
+  var work = new google.maps.LatLng({lat: 28.603488, lng: -81.210895});
+  DistanceMatrixService.getDistanceMatrix({
+    origins: [home],
+    destinations: [school, work],
+    travelMode: google.maps.TravelMode.DRIVING,
+    drivingOptions: {
+      departureTime: new Date(),
+      trafficModel: google.maps.TrafficModel.BEST_GUESS
+    }
+  }, function(response, status) {
+    console.log(response);
+    console.log(response.rows[0].elements[0].duration);
+    console.log(response.rows[0].elements[1].duration_in_traffic);
+  });
+
+}
 
 /* ------------- HELPERS ----------- */
 
