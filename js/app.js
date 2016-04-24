@@ -374,11 +374,11 @@ function displayFeeds(feeds) {
   for (i = 0; i < feeds.length; i++) {
     var feed = feeds[i].feed;
     // Format the the agency names, some of them are odd
-    if (feed.title.includes('NYT')) {
+    if (feed.title.indexOf('NYT') !== -1) {
       $newsModule.append('<p class="article-agency">New York Times</p>');
-    } else if (feed.title.includes('Open')) {
+    } else if (feed.title.indexOf('Open') !== -1) {
       $newsModule.append('<p class="article-agency">Ars Technica</p>');
-    } else if (feed.title.includes('MacRumors')) {
+    } else if (feed.title.indexOf('MacRumors') !== -1) {
       $newsModule.append('<p class="article-agency">Mac Rumors</p>');
     } else {
       $newsModule.append('<p class="article-agency">' + feed.title + '</p>');
@@ -398,6 +398,7 @@ function displayFeeds(feeds) {
 
 function feedLoaded(feed) {
   if (!feed.error) {
+    console.log('Feeds loaded');
     // Cool we loaded a feed, add to feed array
     feeds.push(feed);
     // Wait till all feeds are loaded before displaying
@@ -416,6 +417,7 @@ google.load('feeds', '1');
 google.setOnLoadCallback(getRSSFeeds);
 
 function getRSSFeeds() {
+  console.log('Getting RSS Feeds');
   // Create dem feeeeeeeeddds
   var newYorkTimes = new google.feeds.Feed('http://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml');
   var arsTechnica = new google.feeds.Feed('http://feeds.arstechnica.com/arstechnica/open-source');
