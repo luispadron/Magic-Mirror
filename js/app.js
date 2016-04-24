@@ -21,7 +21,7 @@ function addTasksToPage(tasksR, tasksN) {
   // Clear out the div, this is important so that after first fetch,
   // Div is clear and looks the same
   $todoModule.empty();
-  $todoModule.append('<h3>REMINDERS</h3>');
+  $todoModule.append('<h3><img class="main-title-icon" src="assets/images/todo-icon.png"/> REMINDERS</h3>');
   $todoModule.append('<br>');
   // Do the tasks with reminders first, then the tasks with no remidners
   tasksR.forEach(function(task, index) {
@@ -345,6 +345,37 @@ function requestForecastData(url) {
       complete: setTimeout(requestForecastData, 300000)
     });
 }
+
+/* ------------- NEWS MODULE ----------- */
+function feedLoaded(feed) {
+  if (!feed.error) {
+    console.log(feed);
+  } else {
+    // oops???
+    console.log('Something went wrong while loading the feed...');
+    console.log(feed);
+  }
+}
+
+// Load google feed api, and set call back to
+google.load('feeds', '1');
+google.setOnLoadCallback(getRSSFeeds);
+
+function getRSSFeeds() {
+  // Create dem feeeeeeeeddds
+  var newYorkTimes = new google.feeds.Feed('http://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml');
+  var arsTechnica = new google.feeds.Feed('http://feeds.arstechnica.com/arstechnica/open-source');
+  var macRumors = new google.feeds.Feed('http://feeds.macrumors.com/MacRumors-Front');
+  var yCombinator = new google.feeds.Feed('https://news.ycombinator.com/rss');
+  var viceNews = new google.feeds.Feed('https://news.vice.com/rss');
+  // Wait for google to do its magic and load the feed
+  newYorkTimes.load(feedLoaded);
+  arsTechnica.load(feedLoaded);
+  macRumors.load(feedLoaded);
+  yCombinator.load(feedLoaded);
+  viceNews.load(feedLoaded);
+}
+
 
 /* ------------- HELPERS ----------- */
 
