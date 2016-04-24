@@ -51,7 +51,7 @@ function addTasksToPage(tasksR, tasksN) {
       $todoModule.append(todoCircle);
       $todoModule.append('<p class="todo-item">' + task.title + '</p>');
       var unformatted = new Date(task.reminder.date);
-      var formatted = formatFullDate(unformatted);
+      var formatted = formatFullDate(unformatted, true);
       $todoModule.append('<p class="todo-item-extra">Due on: ' + formatted + '</p>');
     }
   });
@@ -347,9 +347,63 @@ function requestForecastData(url) {
 }
 
 /* ------------- NEWS MODULE ----------- */
+var feeds = [];
+
+function displayFeeds(feeds) {
+  // Cool we got the feeds, now display them
+  console.log(feeds);
+  // Sort feed by date
+  // First add a JS date object to feed
+  for (i = 0; i < feeds.length; i++) {
+    var feed = feeds[i].feed;
+    feed.entries.forEach(function(e) {
+      var jsDate = new Date(e.publishedDate);
+      e.js_date = jsDate;
+    });
+  }
+  // now sort
+  feeds.sort(function(a, b) {
+    return b.feed.entries[0].js_date - a.feed.entries[0].js_date;
+  });
+  // Finally display on page
+  // First clear any content that was in the div
+  var $newsModule = $('.news-module');
+  $newsModule.empty();
+  $newsModule.append('<h3 id="news-title"><img class="main-title-icon" src="assets/images/news-icon.png"/> NEWS</h3>');
+  // Add each feed to page
+  for (i = 0; i < feeds.length; i++) {
+    var feed = feeds[i].feed;
+    // Format the the agency names, some of them are odd
+    if (feed.title.includes('NYT')) {
+      $newsModule.append('<p class="article-agency">New York Times</p>');
+    } else if (feed.title.includes('Open')) {
+      $newsModule.append('<p class="article-agency">Ars Technica</p>');
+    } else if (feed.title.includes('MacRumors')) {
+      $newsModule.append('<p class="article-agency">Mac Rumors</p>');
+    } else {
+      $newsModule.append('<p class="article-agency">' + feed.title + '</p>');
+    }
+
+    // Add the article titles
+    // Currently only getting the most recent article
+    //TODO: Make some cool algorithm to search for most relevant and liked content
+    $newsModule.append('<p class="article-title">' + feed.entries[0].title);
+    // Add the publish date
+    // Format date first
+    var date = new Date(feed.entries[0].publishedDate);
+    var formatted = formatFullDate(date, false);
+    $newsModule.append('<p class="article-date">' + formatted + '</p>');
+  }
+}
+
 function feedLoaded(feed) {
   if (!feed.error) {
-    console.log(feed);
+    // Cool we loaded a feed, add to feed array
+    feeds.push(feed);
+    // Wait till all feeds are loaded before displaying
+    if (feeds.length == 5) {
+      displayFeeds(feeds);
+    }
   } else {
     // oops???
     console.log('Something went wrong while loading the feed...');
@@ -408,9 +462,8 @@ function formatTime(date, withTimeOfDay) {
   }
 }
 
-function formatFullDate(date) {
+function formatFullDate(date, withTime) {
   // Formats entire time, used in the todos-module
-
   // Format the time first
   var formattedTime = formatTime(date, true);
 
@@ -437,8 +490,15 @@ function formatFullDate(date) {
     'Nov.',
     'Dec.'
   ];
-  var dateString = weekday[date.getDay()] + ', ' + month[date.getMonth()] +
-  ' ' + date.getDate() + ' at ' + formattedTime;
+  var dateString = '';
+
+  if (withTime) {
+    dateString = weekday[date.getDay()] + ', ' + month[date.getMonth()] +
+    ' ' + date.getDate() + ' at ' + formattedTime;
+  } else {
+    dateString = weekday[date.getDay()] + ', ' + month[date.getMonth()] +
+    ' ' + date.getDate();
+  }
   return dateString;
 }
 

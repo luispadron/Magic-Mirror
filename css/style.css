@@ -174,3 +174,27 @@ body {
   letter-spacing: 8px;
   border-bottom: 1px solid white;
 }
+
+.article-agency {
+  font-size: 16px;
+  margin-top: 8px;
+  margin-bottom: 0;
+  font-weight: 500;
+  font-style: italic;
+}
+
+.article-title {
+  font-size: 13px;
+  opacity: 0.8;
+  margin-top: 2px;
+  margin-bottom: 0;
+  max-width: 300px;
+  word-wrap:break-word;
+  font-weight: 300;
+}
+
+.article-date {
+  font-size: 12px;
+  opacity: 0.5;
+  margin-top: 1px;
+}
