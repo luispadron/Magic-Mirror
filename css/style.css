@@ -112,6 +112,17 @@ body {
   letter-spacing: 8px;
 }
 
+.todo-date {
+  font-size: 18px;
+  letter-spacing: 3px;
+  font-family: 'Lato', sans-serif;
+  font-weight: 400;
+  display: inline-block;
+  border: 1px solid white;
+  border-radius: 5px;
+  padding: 5px;
+}
+
 #todo-circle {
   width: 14px;
   height: 14px;
@@ -119,15 +130,6 @@ body {
   margin-bottom: 2px;
   vertical-align: middle;
   display: inline-block;
-}
-
-.todo-date {
-  font-size: 18px;
-  letter-spacing: 3px;
-  font-family: 'Lato', sans-serif;
-  font-weight: 400;
-  display: inline-block;
-  border-bottom: 1px dashed white;
 }
 
 .todo-item {
