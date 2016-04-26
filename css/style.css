@@ -153,10 +153,17 @@ body {
 }
 
 /* News Module */
-.news-module {
+
+#news-module-wrapper {
   position: absolute;
   bottom: 0;
   left: 0;
+}
+
+.news-module {
+  overflow: scroll;
+  overflow-y: hidden;
+  height: 400px;
 }
 
 .main-title-icon {

@@ -84,6 +84,7 @@ function cleanUpItems(tasks, reminders) {
     var jsDate = new Date(reminders[i].date);
     reminders[i].js_date = jsDate;
   }
+
   // Now match the tasks with their reminders (if a task has a reminder)
   for (i = 0; i < tasks.length; i++) {
     var task = tasks[i];
@@ -91,6 +92,7 @@ function cleanUpItems(tasks, reminders) {
       var reminder = reminders[j];
       if (task.id == reminder.task_id) {
         task.reminder = reminder;
+        break;
       }
     }
   }
@@ -162,7 +164,7 @@ function onSuccess(lists) {
           },
           complete: function() {
             itemsProcessed++;
-            if (itemsProcessed === lists.length) {
+            if (itemsProcessed == lists.length) {
               // Finally done grabbing EVERYTHING
               // Now do do some organization/clean up
               cleanUpItems(tasks, reminders);
@@ -349,11 +351,22 @@ function requestForecastData(url) {
 /* ------------- NEWS MODULE ----------- */
 var feeds = [];
 
+function animateNewsModule() {
+  // Scroll down slowly, then backup...Forever
+  $('.news-module').animate({
+    scrollTop: $('.news-module').height()
+  }, 25000, function() {
+    $('.news-module').animate({
+      scrollTop: 0
+    }, 5000, animateNewsModule);
+  });
+}
+
 function displayFeeds(feeds) {
   // Cool we got the feeds, now display them
-  console.log(feeds);
   // Sort feed by date
   // First add a JS date object to feed
+  console.log(feeds);
   for (i = 0; i < feeds.length; i++) {
     var feed = feeds[i].feed;
     feed.entries.forEach(function(e) {
@@ -369,7 +382,6 @@ function displayFeeds(feeds) {
   // First clear any content that was in the div
   var $newsModule = $('.news-module');
   $newsModule.empty();
-  $newsModule.append('<h3 id="news-title"><img class="main-title-icon" src="assets/images/news-icon.png"/> NEWS</h3>');
   // Add each feed to page
   for (i = 0; i < feeds.length; i++) {
     var feed = feeds[i].feed;
@@ -387,24 +399,35 @@ function displayFeeds(feeds) {
     // Add the article titles
     // Currently only getting the most recent article
     //TODO: Make some cool algorithm to search for most relevant and liked content
-    $newsModule.append('<p class="article-title">' + feed.entries[0].title);
+
+    //Check to see if feed title is empty, for some reason some of them are at times???
+    var e = 0;
+    while(e < feed.entries.length) {
+      if (feed.entries[e].title === '') {
+        e++;
+      } else {
+        break;
+      }
+    }
+    $newsModule.append('<p class="article-title">' + feed.entries[e].title);
     // Add the publish date
     // Format date first
-    var date = new Date(feed.entries[0].publishedDate);
+    var date = new Date(feed.entries[e].publishedDate);
     var formatted = formatFullDate(date, false);
     $newsModule.append('<p class="article-date">' + formatted + '</p>');
   }
   // Set timeout to update feed every 5 minutes
+  // Also can start animating the module now
   setTimeout(getRSSFeeds, 300000);
+  animateNewsModule();
 }
 
 function feedLoaded(feed) {
   if (!feed.error) {
-    console.log('Feeds loaded');
     // Cool we loaded a feed, add to feed array
     feeds.push(feed);
     // Wait till all feeds are loaded before displaying
-    if (feeds.length == 5) {
+    if (feeds.length == 9) {
       displayFeeds(feeds);
     }
   } else {
@@ -422,38 +445,25 @@ function getRSSFeeds() {
   console.log('Getting RSS Feeds');
   // Create dem feeeeeeeeddds
   var newYorkTimes = new google.feeds.Feed('http://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml');
-  var arsTechnica = new google.feeds.Feed('http://feeds.arstechnica.com/arstechnica/open-source');
+  var arsTech = new google.feeds.Feed('http://feeds.arstechnica.com/arstechnica/index');
+  var arsTechnicaOpenSource = new google.feeds.Feed('http://feeds.arstechnica.com/arstechnica/open-source');
   var macRumors = new google.feeds.Feed('http://feeds.macrumors.com/MacRumors-Front');
   var yCombinator = new google.feeds.Feed('https://news.ycombinator.com/rss');
   var viceNews = new google.feeds.Feed('https://news.vice.com/rss');
+  var pocketNow = new google.feeds.Feed('http://feeds.feedburner.com/pocketnow');
+  var kotaku = new google.feeds.Feed('http://feeds.gawker.com/kotaku/vip');
+  var rps = new google.feeds.Feed('http://feeds.feedburner.com/RockPaperShotgun');
+
   // Wait for google to do its magic and load the feed
   newYorkTimes.load(feedLoaded);
-  arsTechnica.load(feedLoaded);
+  arsTech.load(feedLoaded);
+  arsTechnicaOpenSource.load(feedLoaded);
   macRumors.load(feedLoaded);
   yCombinator.load(feedLoaded);
   viceNews.load(feedLoaded);
-}
-
-/* ------------- TRAFFIC MODULE ----------- */
-function getDirections() {
-  var DistanceMatrixService = new google.maps.DistanceMatrixService();
-  var home = new google.maps.LatLng({lat: 28.523559, lng: -81.223809});
-  var school = new google.maps.LatLng({lat: 28.552118, lng: -81.251784});
-  var work = new google.maps.LatLng({lat: 28.603488, lng: -81.210895});
-  DistanceMatrixService.getDistanceMatrix({
-    origins: [home],
-    destinations: [school, work],
-    travelMode: google.maps.TravelMode.DRIVING,
-    drivingOptions: {
-      departureTime: new Date(),
-      trafficModel: google.maps.TrafficModel.BEST_GUESS
-    }
-  }, function(response, status) {
-    console.log(response);
-    console.log(response.rows[0].elements[0].duration);
-    console.log(response.rows[0].elements[1].duration_in_traffic);
-  });
-
+  pocketNow.load(feedLoaded);
+  kotaku.load(feedLoaded);
+  rps.load(feedLoaded);
 }
 
 /* ------------- HELPERS ----------- */
