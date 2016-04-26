@@ -40,7 +40,21 @@ function addTasksToPage(tasksR, tasksN) {
       $todoModule.append('<p class="todo-item">' + task.title + '</p>');
       var date = new Date(task.reminder.date);
       var formattedDate = formatTime(date, true);
-      $todoModule.append('<p class="todo-item-extra">Due at: ' + formattedDate + '</p>');
+      var string = '<p class="todo-item-exta">Due at <span class="reminder-time">' + formattedDate + '</span></p>';
+      $todoModule.append('<p class="todo-item-extra">Due at: <span class="reminder-time">' + formattedDate + '</span></p>');
+
+      // Check to see if reminder is between one hour of being due and now
+      // If it is, then change the color
+      var now = new Date();
+      // Divide by 360000 since time is in mili
+      var hoursDifference = Math.abs(now - date) / 3600000;
+      console.log(hoursDifference);
+      // Within one hour
+      if (hoursDifference <= 1) {
+        // Change color to red
+        $(".reminder-time").css('color', '#f1404b');
+      }
+
     } else {
       if (!haveAddedUpcomingTitle) {
         $todoModule.append('<p class="todo-date">Upcoming</p>');
@@ -52,7 +66,7 @@ function addTasksToPage(tasksR, tasksN) {
       $todoModule.append('<p class="todo-item">' + task.title + '</p>');
       var unformatted = new Date(task.reminder.date);
       var formatted = formatFullDate(unformatted, true);
-      $todoModule.append('<p class="todo-item-extra">Due on: ' + formatted + '</p>');
+      $todoModule.append('<p class="todo-item-extra">Due on: <span class="reminder-time">' + formatted + '</span></p>');
     }
   });
 
@@ -116,6 +130,71 @@ function cleanUpItems(tasks, reminders) {
   addTasksToPage(tasksWithReminders, tasksNoReminders);
 }
 
+function displayAllTasksDone() {
+  // clear any content that may have been there
+  $todoModule = $('.todos-module');
+  $todoModule.empty();
+  $todoModule.append('<h3><img class="main-title-icon" src="assets/images/todo-icon.png"/> REMINDERS</h3>');
+  $todoModule.append('<br>');
+  // "random" so that its not the same everytime
+  var randomNum = Math.floor(Math.random() * 5) + 1; // Random num from 1-5
+
+  switch(randomNum) {
+    case 1:
+      $todoModule.append('<p>Nothing due, great job!</p>');
+      break;
+    case 2:
+      $todoModule.append('<p>Wow all done, great moves keep it up.<br> Proud of you.</p>');
+      break;
+    case 3:
+      $todoModule.append('<p>You\'ve either been doing all your work,<br>or just not doing anyhting.<br>Either way, nothing due.</p>');
+      break;
+    case 4:
+      $todoModule.append('<p>Get a life, why don\'t we have anything due.</p>');
+      break;
+    case 5:
+      $todoModule.append('<p>Cool, we\'re all done for today.</p>');
+      break;
+  }
+}
+
+function getReminders(tasks) {
+  var itemsProcessed = 0;
+  var reminders = [];
+
+  tasks.forEach(function(task){
+    var remindersURL = 'https://a.wunderlist.com/api/v1/reminders' + '?task_id=' + task.id;
+
+    $.ajax({
+      type: 'GET',
+      dataType: 'json',
+      url: remindersURL,
+      headers: {
+        'X-Access-Token': wunderlistToken,
+        'X-Client-ID': wunderlistClientID
+      },
+      contentType: 'application/json; charset=utf-8',
+      success: function(result) {
+        // Add all reminders to array
+        if (result.length > 0) {
+          result.forEach(function(reminder) {
+            reminders.push(reminder);
+          });
+        }
+      },
+      complete: function() {
+        itemsProcessed++;
+        if (itemsProcessed == tasks.length) {
+          // Finally done grabbing EVERYTHING
+          // Now do do some organization/clean up
+          cleanUpItems(tasks, reminders);
+          console.log('Completed grabbing tasks/reminders');
+        }
+      }
+    });
+  });
+}
+
 function onSuccess(lists) {
   var tasks = [];
   var reminders = [];
@@ -124,7 +203,6 @@ function onSuccess(lists) {
   for (i = 0; i < lists.length; i++) {
     var list = lists[i];
     var tasksURL = 'https://a.wunderlist.com/api/v1/tasks' + '?list_id=' + list.id;
-    var remindersURL = 'https://a.wunderlist.com/api/v1/reminders' + '?list_id=' + list.id;
 
     // Get all the tasks for a list
     $.ajax({
@@ -145,33 +223,16 @@ function onSuccess(lists) {
       },
       complete: function() {
         // Done gettting a task, now get the reminders
-        $.ajax({
-          type: 'GET',
-          dataType: 'json',
-          url: remindersURL,
-          headers: {
-            'X-Access-Token': wunderlistToken,
-            'X-Client-ID': wunderlistClientID
-          },
-          contentType: 'application/json; charset=utf-8',
-          success: function(result) {
-            // Add all reminders to array
-            if (result.length > 0) {
-              result.forEach(function(reminder) {
-                reminders.push(reminder);
-              });
-            }
-          },
-          complete: function() {
-            itemsProcessed++;
-            if (itemsProcessed == lists.length) {
-              // Finally done grabbing EVERYTHING
-              // Now do do some organization/clean up
-              cleanUpItems(tasks, reminders);
-              console.log('Completed grabbing tasks/reminders');
-            }
+        itemsProcessed++;
+        if (itemsProcessed == lists.length) {
+          // Done getting all tasks now get reminders for tasks
+          if (tasks.length === 0) {
+            // If we have no tasks then just display empty on page
+            displayAllTasksDone();
+          } else {
+            getReminders(tasks);
           }
-        });
+        }
       }
     });
   }
