@@ -164,6 +164,7 @@ body {
 
 .news-module {
   overflow: scroll;
+  overflow-x: hidden;
   overflow-y: hidden;
   height: 400px;
 }

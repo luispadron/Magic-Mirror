@@ -416,7 +416,7 @@ function animateNewsModule() {
   // Scroll down slowly, then backup...Forever
   $('.news-module').animate({
     scrollTop: $('.news-module').height()
-  }, 25000, function() {
+  }, 32000, function() {
     $('.news-module').animate({
       scrollTop: 0
     }, 5000, animateNewsModule);
