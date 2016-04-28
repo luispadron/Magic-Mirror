@@ -138,22 +138,22 @@ function displayAllTasksDone() {
   $todoModule.append('<br>');
   // "random" so that its not the same everytime
   var randomNum = Math.floor(Math.random() * 5) + 1; // Random num from 1-5
-
+  debugger;
   switch(randomNum) {
     case 1:
-      $todoModule.append('<p>Nothing due, great job!</p>');
+      $todoModule.append('<p style="opacity: 0.7;">Nothing due, great job!</p>');
       break;
     case 2:
-      $todoModule.append('<p>Wow all done, great moves keep it up.<br> Proud of you.</p>');
+      $todoModule.append('<p style="opacity: 0.7;">Wow all done, great moves keep it up.<br> Proud of you.</p>');
       break;
     case 3:
-      $todoModule.append('<p>You\'ve either been doing all your work,<br>or just not doing anyhting.<br>Either way, nothing due.</p>');
+      $todoModule.append('<p style="opacity: 0.7;">You\'ve either been doing all your work,<br>or just not doing anyhting.<br>Either way, nothing due.</p>');
       break;
     case 4:
-      $todoModule.append('<p>Get a life, why don\'t we have anything due.</p>');
+      $todoModule.append('<p style="opacity: 0.7;">Get a life, why don\'t we have anything due.</p>');
       break;
     case 5:
-      $todoModule.append('<p>Cool, we\'re all done for today.</p>');
+      $todoModule.append('<p style="opacity: 0.7;">Cool, we\'re all done for today.</p>');
       break;
   }
 }

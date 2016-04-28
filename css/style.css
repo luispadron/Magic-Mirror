@@ -8,6 +8,30 @@ body {
   overflow-x: hidden;
 }
 
+/* Greeting */
+
+.greeting {
+  /* Center in middle */
+  font-size: 35px;
+  letter-spacing: 2px;
+  position: absolute;
+  top:0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  height: 1px;
+  text-align: center;
+  font-weight: 300;
+}
+
+.greeting-extra {
+  font-weight: 300;
+  font-style: italic;
+  font-size: 25px;
+  opacity: 0.6;
+}
+
 /* Style the weather module */
 
 .weather-info {
