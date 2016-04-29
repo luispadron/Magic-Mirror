@@ -6,6 +6,7 @@ body {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
+  overflow-y: hidden;
 }
 
 /* Greeting */
@@ -28,8 +29,12 @@ body {
 .greeting-extra {
   font-weight: 300;
   font-style: italic;
-  font-size: 25px;
+  font-size: 20px;
   opacity: 0.6;
+}
+
+.amnt {
+  color: yellow;
 }
 
 /* Style the weather module */
@@ -176,6 +181,14 @@ body {
   opacity: 0.6;
   margin-left: 22px;
   font-style: italic;
+}
+
+.due-soon {
+  color: #FFEB3B;
+}
+
+.late {
+  color: #f44336;
 }
 
 /* News Module */

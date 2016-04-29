@@ -8,6 +8,150 @@ var apiKeys;
 var wunderlistToken;
 var wunderlistClientID;
 
+// These are some global vars that are used within the updateGreeting() method
+var isFirstTimeUpdating = true;
+var isRemindersDone = false;
+var isWeatherDone = false;
+var remindersForToday = 0;
+var upcomingRemindersNow = 0;
+var remindersWithNoDatesNow = 0;
+var weatherObjNow;
+
+
+/* ------------- GREETING METHODS ----------- */
+
+function displayGreeting(weatherObj, reminders, upcomingR, noDateR) {
+  // Do some logic
+  var rightNow = new Date();
+  var timeGreeting;
+  rightNow = formatTime(rightNow, true).split(':');
+
+  var timeInt = parseInt(rightNow[0]);
+  // Figure out the greeting time
+  if (rightNow[1].indexOf('PM') > -1) {
+    // Its the afternoon
+
+    if (timeInt == 12 || timeInt <= 6) {
+      timeGreeting = 'Good afternoon, ';
+    } else if (timeInt > 6 ) {
+      timeGreeting = 'Good evening, ';
+    }
+  } else {
+    // It's some time past 11PM
+    if (timeInt == 12 || time >= 1 && timeInt <= 4) {
+      // Going to say good evening still, since its not really the morning
+      timeGreeting = 'Good evening, ';
+    } else if (timeInt > 4 && timeInt <= 11) {
+      timeGreeting = 'Good morning, ';
+    }
+  }
+
+  // Now add the weather summary to greeting
+  var weatherSummary = '';
+  if (timeGreeting === 'Good morning, ') {
+    // Only care about day summary during the morning
+    weatherSummary = weatherObj.daily.data[0].summary.toLowerCase();
+  } else {
+    // If not the morning give hourly summary
+    weatherSummary = weatherObj.hourly.data[0].summary.toLowerCase() + ' currently.';
+  }
+
+  var finalGreeting = timeGreeting + weatherSummary;
+
+  // Figure out reminder greeting info
+  var reminderSummary = '';
+
+  if (reminders > 0) {
+    if (reminders > 1) {
+      reminderSummary = 'You have <span class="amnt">' + reminders + '</span> tasks due today';
+    } else {
+      reminderSummary = 'You have <span class="amnt">' + reminders + '</span> task due today';
+    }
+  }
+
+  if (upcomingR > 0) {
+    if (reminders > 0) {
+      if (upcomingR > 1) {
+        reminderSummary += ', aswell as <span class="amnt">' + upcomingR + '</span> upcoming tasks.';
+      } else {
+        reminderSummary += ', aswell as <span class="amnt">' + upcomingR + '</span> upcoming task.';
+      }
+    } else {
+      if (upcomingR > 1) {
+        reminderSummary = 'You have <span class="amnt">' + upcomingR + '</span> upcoming tasks';
+      } else {
+        reminderSummary = 'You have <span class="amnt">' + upcomingR + '</span> upcoming task';
+      }
+    }
+  }
+
+  if (noDateR > 0) {
+    if ((reminders > 0 && upcomingR <= 0) || (reminders <= 0 && upcomingR > 0)) {
+      if (noDateR > 1) {
+        reminderSummary += ', aswell as <span class="amnt">' + noDateR + '</span> general tasks floating around.';
+      } else {
+        reminderSummary += ', aswell as <span class="amnt">' + noDateR + '</span> general task that you should finish.';
+      }
+    } else if (reminders > 0 && upcomingR > 0) {
+      if (noDateR > 1) {
+        reminderSummary += ' Finally, <span class="amnt">' + noDateR + '</span> general tasks that should be completed.';
+      } else {
+        reminderSummary += ' Finally, <span class="amnt">' + noDateR + '</span> general task that needs completion.';
+      }
+    } else if (reminders <= 0 && upcomingR <= 0) {
+      if (noDateR > 1) {
+        reminderSummary = 'You have <span class="amnt">' + noDateR + '</span> general things to do soon';
+      } else {
+        reminderSummary = 'You have <span class="amnt">' + noDateR + '</span> general thing to do soon';
+      }
+    }
+  }
+
+  if (reminders < 0 && upcomingR < 0 && noDateR < 0) {
+     // If there are no reminders at ALL
+    // "random" so that its not the same everytime
+    var randomNum = Math.floor(Math.random() * 3) + 1; // Random num from 1-5
+    switch(randomNum) {
+      case 1:
+        reminderSummary = 'Nothing due today.';
+        break;
+      case 2:
+        reminderSummary = 'Cool, nothing to-do today!';
+        break;
+      case 3:
+        reminderSummary = 'Nothing important going on for today.';
+        break;
+    }
+  }
+
+  // Finally display this
+  $greetingModule = $('.greeting');
+  // Empty out the div
+  $greetingModule.empty();
+  $greetingModule.append('<span>' + finalGreeting + '</span><br>');
+  $greetingModule.append('<span class="greeting-extra">' + reminderSummary + '</span>');
+}
+
+function updateGreeting() {
+  if (isRemindersDone && isWeatherDone) {
+    // Set these back to false, so that we then wait until new fetches before Updating
+    isRemindersDone = false;
+    isWeatherDone = false;
+    isFirstTimeUpdating = false;
+
+    // Display on page
+    displayGreeting(weatherObjNow, remindersForToday, upcomingRemindersNow, remindersWithNoDatesNow);
+  }
+
+  // Set timeout to 30 seconds, and call self, so that its always updated
+  // isFirstTimeUpdating will be checked because this way we can make sure that the call back
+  // is set to 1 second and updated quicker, than if we were to wait 30 seconds on first start
+  if (isFirstTimeUpdating) {
+    setTimeout(updateGreeting, 1000);
+  } else {
+    setTimeout(updateGreeting, 30000);
+  }
+}
 
 /* ------------- TODOS METHODS ----------- */
 
@@ -20,6 +164,11 @@ function addTasksToPage(tasksR, tasksN) {
 
   // Clear out the div, this is important so that after first fetch,
   // Div is clear and looks the same
+  // Also, set reminders for today to zero, since this is a new fetch
+  remindersForToday = 0;
+  upcomingRemindersNow = 0;
+  remindersWithNoDatesNow = 0;
+
   $todoModule.empty();
   $todoModule.append('<h3><img class="main-title-icon" src="assets/images/todo-icon.png"/> REMINDERS</h3>');
   $todoModule.append('<br>');
@@ -31,6 +180,10 @@ function addTasksToPage(tasksR, tasksN) {
 
     if (dateForReminder.getDay() == today.getDay()) {
       // Due today, append after today section
+      // Also increase count of remindersForToday, this is used in the greeting message
+      // For example: if there are 3 reminders today it might say
+      // Good afternoon, three tasks to-do today.
+      remindersForToday++;
       if (!haveAddedTodayTitle) {
         $todoModule.append('<p class="todo-date">Today</p>');
         $todoModule.append('<br>');
@@ -50,12 +203,19 @@ function addTasksToPage(tasksR, tasksN) {
       var hoursDifference = Math.abs(now - date) / 3600000;
       console.log(hoursDifference);
       // Within one hour
-      if (hoursDifference <= 1) {
-        // Change color to red
-        $(".reminder-time").css('color', '#f1404b');
+      debugger;
+      if (hoursDifference <= 1 && date > now) {
+        // Change color to yellow-ish
+        $(".reminder-time").addClass('due-soon');
+      } else if (date <= now) {
+        // Overdue, make color red
+        $(".reminder-time").addClass('late');
       }
 
     } else {
+      // Increase count of upcoming reminders global var
+      upcomingRemindersNow++;
+
       if (!haveAddedUpcomingTitle) {
         $todoModule.append('<p class="todo-date">Upcoming</p>');
         $todoModule.append('<br>');
@@ -71,12 +231,17 @@ function addTasksToPage(tasksR, tasksN) {
   });
 
   tasksN.forEach(function(task, index) {
+    // Increase count of reminders with no dates global var, used in updateGreeting
+    remindersWithNoDatesNow++;
+
     $todoModule.append(todoCircle);
     $todoModule.append('<p class="todo-item-no-date">' + task.title + '</p>');
     $todoModule.append('<br>');
   });
 
   // After appending content start a time out of 15 minutes, to grab reminders every 15 minutes
+  // Also set global var isRemindersDone to true
+  isRemindersDone = true;
   setTimeout(requestWunderlist, 900000);
 }
 
@@ -138,7 +303,6 @@ function displayAllTasksDone() {
   $todoModule.append('<br>');
   // "random" so that its not the same everytime
   var randomNum = Math.floor(Math.random() * 5) + 1; // Random num from 1-5
-  debugger;
   switch(randomNum) {
     case 1:
       $todoModule.append('<p style="opacity: 0.7;">Nothing due, great job!</p>');
@@ -156,6 +320,10 @@ function displayAllTasksDone() {
       $todoModule.append('<p style="opacity: 0.7;">Cool, we\'re all done for today.</p>');
       break;
   }
+  // Set a time out to repeat the request for new reminders every 15 minutes
+  // Also set is reminders done to true, and that we have no reminders
+  isRemindersDone = true;
+
 }
 
 function getReminders(tasks) {
@@ -331,6 +499,10 @@ function updateWeatherInfo(json) {
   var weatherIcon = 'assets/images/' + json.currently.icon + '.png';
   $('#main-weather-icon').attr('src', weatherIcon);
 
+  // Set the low and max temp global vars that will be used inside the updateGreeting() method
+  console.log(json);
+  weatherObjNow = json;
+
   // Set sunrise and sundown time
   var dailyArray = json.daily.data;
   // This is in UNIX time, must be converted, also 0 element because
@@ -405,7 +577,12 @@ function requestForecastData(url) {
       dataType: 'jsonp',
       url: forecastURL,
       success: updateWeatherInfo,
-      complete: setTimeout(requestForecastData, 300000)
+      complete: function() {
+        // Repeat every 5 minutes
+        // Set isWeatherDone globar var to true
+        isWeatherDone = true;
+        setTimeout(requestForecastData, 300000);
+      }
     });
 }
 
@@ -601,3 +778,4 @@ function formatFullDate(date, withTime) {
 // Called once, in order to get data initially, then
 // Timers handle the calls
 loadKeys();
+updateGreeting();
