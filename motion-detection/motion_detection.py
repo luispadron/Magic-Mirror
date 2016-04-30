@@ -32,8 +32,10 @@ class MotionDetectorAdaptative():
 
     def wakeMonitorIfOff(self):
         print "~~~ Movement detected ~~~"
+
         # Reset time since last moved since we just had movement
         self.timeSinceLastMoved = time.time()
+        self.timeSinceLastLog = time.time()
 
         if not self.isMonitorOn:
             print 'Monitor is off, waking it up'

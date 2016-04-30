@@ -239,10 +239,10 @@ function addTasksToPage(tasksR, tasksN) {
     $todoModule.append('<br>');
   });
 
-  // After appending content start a time out of 15 minutes, to grab reminders every 15 minutes
+  // After appending content start a time out of 5 minutes, to grab reminders every 5 minutes
   // Also set global var isRemindersDone to true
   isRemindersDone = true;
-  setTimeout(requestWunderlist, 900000);
+  setTimeout(requestWunderlist, 300000);
 }
 
 function cleanUpItems(tasks, reminders) {
@@ -654,9 +654,9 @@ function displayFeeds(feeds) {
     var formatted = formatFullDate(date, false);
     $newsModule.append('<p class="article-date">' + formatted + '</p>');
   }
-  // Set timeout to update feed every 5 minutes
+  // Set timeout to update feed every 2 minutes
   // Also can start animating the module now
-  setTimeout(getRSSFeeds, 300000);
+  setTimeout(getRSSFeeds, 120000);
   animateNewsModule();
 }
 
