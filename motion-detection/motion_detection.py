@@ -12,7 +12,9 @@ class MotionDetectorAdaptative():
         self.writer = None
         self.font = None
         self.frame = None
-
+        self.log = sys.stdout
+        self.logFile = open("logFile.log", "w")
+        sys.stdout = self.logFile
         # Monitor on/or off
         self.isMonitorOn = True
 
@@ -31,8 +33,7 @@ class MotionDetectorAdaptative():
         self.trigger_time = 0 # Hold timestamp of the last detection
 
     def wakeMonitorIfOff(self):
-        print "~~~ Movement detected ~~~"
-
+        print "movement detected"
         # Reset time since last moved since we just had movement
         self.timeSinceLastMoved = time.time()
         self.timeSinceLastLog = time.time()
@@ -53,8 +54,8 @@ class MotionDetectorAdaptative():
                 call(["xset", "dpms", "force", "off"])
                 self.isMonitorOn = False
         # Log only every 2 minutes
-        if time.time() - self.timeSinceLastLog > 120:
-            print "No movement in 2 minutes, still watching."
+        if time.time() - self.timeSinceLastLog > 590:
+            print "No movement in 10 minutes, still watching."
             self.timeSinceLastLog = time.time()
 
     def run(self):
