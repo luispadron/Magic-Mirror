@@ -408,7 +408,6 @@ function onSuccess(lists) {
 
 function onFail(result) {
   /* oops, something broke */
-  alert('We broken fam, pls fix');
   console.log(result);
 }
 
@@ -631,7 +630,8 @@ function displayFeeds(feeds) {
     } else if (feed.title.indexOf('MacRumors') !== -1) {
       $newsModule.append('<p class="article-agency">Mac Rumors</p>');
     } else {
-      $newsModule.append('<p class="article-agency">' + feed.title + '</p>');
+      $newsMo
+      dule.append('<p class="article-agency">' + feed.title + '</p>');
     }
 
     // Add the article titles
