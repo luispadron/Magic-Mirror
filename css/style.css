@@ -50,6 +50,7 @@ body {
   width: 62px;
   vertical-align: middle;
 }
+
 #main-weather-temp {
   font-family: 'Lato', sans-serif;
   font-size: 36px;
@@ -58,7 +59,7 @@ body {
 }
 
 .sun-up-down {
-  opacity: 0.7;
+  opacity: 0.9;
   display: inline-block;
 }
 
@@ -84,7 +85,7 @@ body {
   margin-top: 5px;
   font-size: 13px;
   font-weight: 300;
-  opacity: 0.5;
+  opacity: 0.9;
   display: inline-block;
   text-align: center;
   font-family: 'Lato', sans-serif;
@@ -119,7 +120,7 @@ body {
   text-align: center;
   font-weight: 300;
   font-size: 20px;
-  opacity: 0.7;
+  opacity: 0.9;
 }
 
 .date-time-info p {
@@ -162,14 +163,14 @@ body {
 }
 
 .todo-item {
-  font-size: 14px;
+  font-size: 16px;
   margin-bottom: 0;
   display: inline-block;
   margin-left: 2px;
 }
 
 .todo-item-no-date {
-  font-size: 14px;
+  font-size: 16px;
   margin-bottom: 15px;
   display: inline-block;
   margin-left: 5px;
@@ -177,8 +178,8 @@ body {
 
 .todo-item-extra {
   margin-top: 3px;
-  font-size: 12px;
-  opacity: 0.6;
+  font-size: 13px;
+  opacity: 0.9;
   margin-left: 22px;
   font-style: italic;
 }

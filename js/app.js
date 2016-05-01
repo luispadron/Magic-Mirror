@@ -38,7 +38,7 @@ function displayGreeting(weatherObj, reminders, upcomingR, noDateR) {
     }
   } else {
     // It's some time past 11PM
-    if (timeInt == 12 || time >= 1 && timeInt <= 4) {
+    if (timeInt == 12 || timeInt >= 1 && timeInt <= 4) {
       // Going to say good evening still, since its not really the morning
       timeGreeting = 'Good evening, ';
     } else if (timeInt > 4 && timeInt <= 11) {
@@ -478,9 +478,9 @@ function updateTime() {
   var dateString = weekday[currentDate.getDay()] + ', ' + month[currentDate.getMonth()] +
   ' ' + currentDate.getDate();
 
-  $('.date-time-info p').next().text(dateString);
+  $('.date-time-info p').text(dateString);
   // Update the time in HTML
-  $('.date-time-info p').next().next().text(finalTimeString);
+  $('.date-time-info p').next().text(finalTimeString);
   // Call self in order to repeat every second
   setTimeout(updateTime, 1000);
 }
