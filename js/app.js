@@ -630,13 +630,12 @@ function displayFeeds(feeds) {
     } else if (feed.title.indexOf('MacRumors') !== -1) {
       $newsModule.append('<p class="article-agency">Mac Rumors</p>');
     } else {
-      $newsMo
-      dule.append('<p class="article-agency">' + feed.title + '</p>');
+      $newsModule.append('<p class="article-agency">' + feed.title + '</p>');
     }
 
     // Add the article titles
     // Currently only getting the most recent article
-    //TODO: Make some cool algorithm to search for most relevant and liked content
+    //TODO: Make some cool  algorithm to search for most relevant and liked content
 
     //Check to see if feed title is empty, for some reason some of them are at times???
     var e = 0;
