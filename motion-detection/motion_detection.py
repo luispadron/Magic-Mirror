@@ -43,13 +43,15 @@ class MotionDetectorAdaptative():
             call(["xset", "s", "reset"])
             call(["xset", "dpms", "force", "on"])
             self.isMonitorOn = True
+        else:
+            print "Monitor is still on"
 
     def checkTimeSinceLastMoved(self):
         # Called every time there is no movement
         if self.timeSinceLastMoved == None:
             print "Time since last moved is null, waiting for first move to happen before timer begins."
         else:
-            if time.time() - self.timeSinceLastMoved > 3540 and self.isMonitorOn:
+            if time.time() - self.timeSinceLastMoved > 590 and self.isMonitorOn:
                 print "1 hour passed with no movement, shutting monitor off."
                 call(["xset", "dpms", "force", "off"])
                 self.isMonitorOn = False

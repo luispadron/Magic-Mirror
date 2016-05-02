@@ -203,7 +203,6 @@ function addTasksToPage(tasksR, tasksN) {
       var hoursDifference = Math.abs(now - date) / 3600000;
       console.log(hoursDifference);
       // Within one hour
-      debugger;
       if (hoursDifference <= 1 && date > now) {
         // Change color to yellow-ish
         $(".reminder-time").addClass('due-soon');
