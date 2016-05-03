@@ -41,8 +41,8 @@ class MotionDetectorAdaptative():
         if not self.isMonitorOn:
             print "movement detected"
             print 'Monitor is off, waking it up'
-            call(["xset", "s", "reset"])
-            call(["xset", "dpms", "force", "on"])
+            call(["xset", "s", "off"])
+            call(["xset", "+dpms"])
             self.isMonitorOn = True
         else:
             print "Movement detected, monitor is still on"
@@ -54,7 +54,10 @@ class MotionDetectorAdaptative():
         else:
             if time.time() - self.timeSinceLastMoved > 1770 and self.isMonitorOn:
                 print "30 minutes passed with no movement, shutting monitor off."
-                call(["xset", "dpms", "force", "off"])
+                # activate screen saver, just blank screen
+                call(["xset", "+dpms"])
+                call(["xset", "s", "on"])
+                call(["xset", "s", "activate"])
                 self.isMonitorOn = False
         # Log only every 10 minutes
         if time.time() - self.timeSinceLastLog > 590:
