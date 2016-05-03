@@ -14,7 +14,7 @@ If you would like to learn more or build your own, read my [article](https://www
 
 ## Credit
 ```
-Weather Icons: [icons8](https://icons8.com/c/rtj6/Weather)
+Weather Icons: https://icons8.com/c/rtj6/Weather
 
-Motion detection script, is an altered version of [this](https://github.com/RobinDavid/Motion-detection-OpenCV)
+Motion detection script, is an altered version of https://github.com/RobinDavid/Motion-detection-OpenCV
 ```
