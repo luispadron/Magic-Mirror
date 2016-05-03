@@ -2,7 +2,7 @@ import cv2.cv as cv
 from datetime import datetime
 import time
 import sys
-from subprocess import call
+import os
 
 class MotionDetectorAdaptative():
 
@@ -41,8 +41,7 @@ class MotionDetectorAdaptative():
         if not self.isMonitorOn:
             print "movement detected"
             print 'Monitor is off, waking it up'
-            call(["xset", "s", "off"])
-            call(["xset", "+dpms"])
+	    os.system("xset dpms force on")	
             self.isMonitorOn = True
         else:
             print "Movement detected, monitor is still on"
@@ -55,10 +54,8 @@ class MotionDetectorAdaptative():
             if time.time() - self.timeSinceLastMoved > 1770 and self.isMonitorOn:
                 print "30 minutes passed with no movement, shutting monitor off."
                 # activate screen saver, just blank screen
-                call(["xset", "+dpms"])
-                call(["xset", "s", "on"])
-                call(["xset", "s", "activate"])
-                self.isMonitorOn = False
+		os.system("sleep 1; xset dpms force off")
+		self.isMonitorOn = False
         # Log only every 10 minutes
         if time.time() - self.timeSinceLastLog > 590:
             print "No movement in 10 minutes, still watching."
