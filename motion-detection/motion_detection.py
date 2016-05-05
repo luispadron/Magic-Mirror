@@ -51,8 +51,8 @@ class MotionDetectorAdaptative():
         if self.timeSinceLastMoved == None:
             print "Time since last moved is null, waiting for first move to happen before timer begins."
         else:
-            if time.time() - self.timeSinceLastMoved > 1770 and self.isMonitorOn:
-                print "30 minutes passed with no movement, shutting monitor off."
+            if time.time() - self.timeSinceLastMoved > 590 and self.isMonitorOn:
+                print "10 minutes passed with no movement, shutting monitor off."
                 # activate screen saver, just blank screen
 		os.system("sleep 1; xset dpms force off")
 		self.isMonitorOn = False
