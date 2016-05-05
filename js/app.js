@@ -201,7 +201,7 @@ function addTasksToPage(tasksR, tasksN) {
       var now = new Date();
       // Divide by 360000 since time is in mili
       var hoursDifference = Math.abs(now - date) / 3600000;
-      console.log(hoursDifference);
+
       // Within one hour
       if (hoursDifference <= 1 && date > now) {
         // Change color to yellow-ish
@@ -407,6 +407,7 @@ function onSuccess(lists) {
 
 function onFail(result) {
   /* oops, something broke */
+  console.log('Something broke while getting tasks.')
   console.log(result);
 }
 
@@ -498,7 +499,6 @@ function updateWeatherInfo(json) {
   $('#main-weather-icon').attr('src', weatherIcon);
 
   // Set the low and max temp global vars that will be used inside the updateGreeting() method
-  console.log(json);
   weatherObjNow = json;
 
   // Set sunrise and sundown time
@@ -602,7 +602,6 @@ function displayFeeds(feeds) {
   // Cool we got the feeds, now display them
   // Sort feed by date
   // First add a JS date object to feed
-  console.log(feeds);
   for (i = 0; i < feeds.length; i++) {
     var feed = feeds[i].feed;
     feed.entries.forEach(function(e) {
@@ -652,8 +651,10 @@ function displayFeeds(feeds) {
     var formatted = formatFullDate(date, false);
     $newsModule.append('<p class="article-date">' + formatted + '</p>');
   }
+
   // Set timeout to update feed every 2 minutes
   // Also can start animating the module now
+  console.log('Done displaying feeds');
   setTimeout(getRSSFeeds, 120000);
   animateNewsModule();
 }
@@ -664,7 +665,10 @@ function feedLoaded(feed) {
     feeds.push(feed);
     // Wait till all feeds are loaded before displaying
     if (feeds.length == 9) {
+      console.log('All feeds loaded, displaying them now.');
       displayFeeds(feeds);
+      // Reset feeds array
+      feeds = [];
     }
   } else {
     // oops???
