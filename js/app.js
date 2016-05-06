@@ -656,7 +656,6 @@ function displayFeeds(feeds) {
   // Also can start animating the module now
   console.log('Done displaying feeds');
   setTimeout(getRSSFeeds, 120000);
-  animateNewsModule();
 }
 
 function feedLoaded(feed) {
@@ -780,4 +779,6 @@ function formatFullDate(date, withTime) {
 // Called once, in order to get data initially, then
 // Timers handle the calls
 loadKeys();
+
+animateNewsModule();
 updateGreeting();
