@@ -1,0 +1,11 @@
+import os
+os.system("sleep 1; echo 'reseting display settins'")
+os.system("sleep 1; xset s reset")
+os.system("sleep 1; xset s default")
+os.system("sleep 1; xset s 0 0")
+os.system("sleep 1; xset dpms 0 0 0")
+os.system("sleep 1; xset -dpms")
+os.system("sleep 1; echo 'Display settings reset, testing now'")
+os.system("sleep 1; xset dpms force off")
+os.system("sleep 3; xset dpms force on")
+os.system("sleep 1; echo 'Display test done'")

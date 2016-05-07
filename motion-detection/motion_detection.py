@@ -57,8 +57,8 @@ class MotionDetectorAdaptative():
 		os.system("sleep 1; xset dpms force off")
 		self.isMonitorOn = False
         # Log only every 10 minutes
-        if time.time() - self.timeSinceLastLog > 590:
-            print "No movement in 10 minutes, still watching."
+        if time.time() - self.timeSinceLastLog > 295:
+            print "No movement in 5 minutes, still watching."
             self.timeSinceLastLog = time.time()
 
     def run(self):
