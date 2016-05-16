@@ -178,7 +178,7 @@ function addTasksToPage(tasksR, tasksN) {
     var dateForReminder = task.reminder.js_date;
     var today = new Date();
 
-    if (dateForReminder.getDay() == today.getDay()) {
+    if (dateForReminder.setHours(0, 0, 0, 0) == today.setHours(0, 0, 0, 0)) {
       // Due today, append after today section
       // Also increase count of remindersForToday, this is used in the greeting message
       // For example: if there are 3 reminders today it might say
