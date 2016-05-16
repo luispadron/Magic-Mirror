@@ -9,6 +9,7 @@ class MotionDetectorAdaptative():
     def __init__(self, threshold=1):
         self.timeSinceLastMoved = None
         self.timeSinceLastLog = time.time()
+	self.timeSinceClean = time.time()
         self.writer = None
         self.font = None
         self.frame = None
@@ -56,10 +57,18 @@ class MotionDetectorAdaptative():
                 # activate screen saver, just blank screen
 		os.system("sleep 1; xset dpms force off")
 		self.isMonitorOn = False
+	
+	self.clean_session()
         # Log only every 10 minutes
         if time.time() - self.timeSinceLastLog > 295:
             print "No movement in 5 minutes, still watching."
             self.timeSinceLastLog = time.time()
+
+    def clean_session(self):
+	if time.time() - self.timeSinceClean > 3540:
+	    print "Removing xsession-errors"
+            os.system("sudo rm ~/.xsession-errors")
+	    self.timeSinceClean = time.time()
 
     def run(self):
         started = time.time()
